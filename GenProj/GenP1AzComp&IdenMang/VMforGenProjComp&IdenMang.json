@@ -1,0 +1,127 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_vm_ts_prd_cus_1_name": {
+            "defaultValue": "vm-ts-prd-cus-1",
+            "type": "String"
+        },
+        "disks_vm_ts_prd_cus_1_OsDisk_1_6ccfcfc83dcc44ecbb061a84e535f54c_externalid": {
+            "defaultValue": "/subscriptions/b4449a41-633d-420e-8939-23c0f7a72e40/resourceGroups/LEARNPLATFORMRG/providers/Microsoft.Compute/disks/vm-ts-prd-cus-1_OsDisk_1_6ccfcfc83dcc44ecbb061a84e535f54c",
+            "type": "String"
+        },
+        "disks_vm_ts_prd_cus_1_DataDisk_0_externalid": {
+            "defaultValue": "/subscriptions/b4449a41-633d-420e-8939-23c0f7a72e40/resourceGroups/LearnPlatformRG/providers/Microsoft.Compute/disks/vm-ts-prd-cus-1_DataDisk_0",
+            "type": "String"
+        },
+        "networkInterfaces_vm_ts_prd_cus_1533_externalid": {
+            "defaultValue": "/subscriptions/b4449a41-633d-420e-8939-23c0f7a72e40/resourceGroups/LearnPlatformRG/providers/Microsoft.Network/networkInterfaces/vm-ts-prd-cus-1533",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2025-04-01",
+            "name": "[parameters('virtualMachines_vm_ts_prd_cus_1_name')]",
+            "location": "centralus",
+            "tags": {
+                "Environment": "Test"
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2s_v3"
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "ubuntu-24_04-lts",
+                        "sku": "server",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachines_vm_ts_prd_cus_1_name'), '_OsDisk_1_6ccfcfc83dcc44ecbb061a84e535f54c')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS",
+                            "id": "[parameters('disks_vm_ts_prd_cus_1_OsDisk_1_6ccfcfc83dcc44ecbb061a84e535f54c_externalid')]"
+                        },
+                        "deleteOption": "Delete",
+                        "diskSizeGB": 30
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachines_vm_ts_prd_cus_1_name'), '_DataDisk_0')]",
+                            "createOption": "Attach",
+                            "caching": "ReadOnly",
+                            "writeAcceleratorEnabled": false,
+                            "managedDisk": {
+                                "storageAccountType": "StandardSSD_LRS",
+                                "id": "[parameters('disks_vm_ts_prd_cus_1_DataDisk_0_externalid')]"
+                            },
+                            "deleteOption": "Delete",
+                            "diskSizeGB": 32,
+                            "toBeDetached": false
+                        }
+                    ],
+                    "diskControllerType": "SCSI"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_vm_ts_prd_cus_1_name')]",
+                    "adminUsername": "IsaacAdmin",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "/home/IsaacAdmin/.ssh/authorized_keys",
+                                    "keyData": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1KD3Ap/s0qHB2UX+JtpGaVPyxFULR14XGiaq8gTSLX generated-by-azure"
+                                }
+                            ]
+                        },
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        }
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "securityProfile": {
+                    "uefiSettings": {
+                        "secureBootEnabled": true,
+                        "vTpmEnabled": true
+                    },
+                    "securityType": "TrustedLaunch"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_vm_ts_prd_cus_1533_externalid')]",
+                            "properties": {
+                                "deleteOption": "Delete"
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        }
+    ]
+}
